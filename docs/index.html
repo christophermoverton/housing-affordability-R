@@ -114,18 +114,20 @@
       margin-top: 10px;
       font-size: 0.9rem;
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
       align-items: center;
+      gap: 10px;
     }
 
     .author .contact a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 500;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0;              /* 🔑 removes pill feel */
+      background: none;        /* 🔑 removes pill feel */
+      border: none;            /* 🔑 removes pill feel */
     }
 
     .author .contact a:hover {
@@ -133,16 +135,18 @@
     }
 
     .icon {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       fill: currentColor;
-      opacity: 0.9;
+      position: relative;
+      top: 1px;                /* 🔑 baseline alignment fix */
     }
 
     .author .sep {
       color: var(--muted);
       font-size: 0.85rem;
     }
+
 
 
 
@@ -157,22 +161,25 @@
     <div class="role">Data Science</div>
 
     <div class="contact">
-    <a href="https://www.linkedin.com/in/christopher-overton-485a4658" target="_blank" aria-label="LinkedIn">
-        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-        <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 24V7h5v17H0zM8 7h4.8v2.3h.07c.67-1.27 2.3-2.6 4.73-2.6C22.4 6.7 24 9.6 24 14.1V24h-5v-8.5c0-2-.04-4.6-2.8-4.6-2.8 0-3.23 2.2-3.23 4.5V24H8z"/>
+    <a href="https://www.linkedin.com/in/christopher-overton-485a4658"
+        target="_blank"
+        aria-label="LinkedIn profile">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11.34 19h-3v-10h3v10zm-1.5-11.3c-.97 0-1.66-.7-1.66-1.57 0-.89.7-1.58 1.68-1.58s1.66.69 1.66 1.58c0 .87-.69 1.57-1.68 1.57zm13.84 11.3h-3v-5.6c0-1.34-.03-3.06-1.87-3.06-1.87 0-2.16 1.46-2.16 2.97v5.69h-3v-10h2.88v1.37h.04c.4-.76 1.38-1.56 2.84-1.56 3.04 0 3.6 2 3.6 4.6v5.59z"/>
         </svg>
-        linkedin.com/in/christopher-overton-485a4658
+        LinkedIn
     </a>
 
     <span class="sep">•</span>
 
-    <a href="mailto:christophermoverton@gmail.com" aria-label="Email">
-        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+    <a href="mailto:christophermoverton@gmail.com" aria-label="Email address">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
         </svg>
-        christophermoverton@gmail.com
+        Email
     </a>
     </div>
+
 
 
     <div class="date">Last updated: January 2026</div>
