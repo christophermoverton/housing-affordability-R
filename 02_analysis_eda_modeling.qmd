@@ -1,5 +1,5 @@
 ---
-title: "02_analysis_eda_modeling"
+title: "Housing Affordability in the United States: Prices, Income, and Interest Rates (2000–2025)"
 format: html
 editor: visual
 bibliography: reference.bib
