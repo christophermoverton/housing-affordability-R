@@ -110,23 +110,6 @@
       font-weight: 600;
     }
 
-    .author {
-      margin-top: 18px;
-      margin-bottom: 32px;
-    }
-
-    .author .name {
-      font-weight: 600;
-      font-size: 1.05rem;
-      color: var(--text);
-    }
-
-    .author .role {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
     .author .contact {
       margin-top: 10px;
       font-size: 0.9rem;
@@ -140,10 +123,20 @@
       color: var(--accent);
       text-decoration: none;
       font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .author .contact a:hover {
       text-decoration: underline;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      opacity: 0.9;
     }
 
     .author .sep {
@@ -151,12 +144,6 @@
       font-size: 0.85rem;
     }
 
-    .author .date {
-      margin-top: 8px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      opacity: 0.9;
-    }
 
 
   </style>
@@ -167,17 +154,26 @@
     <h1>Housing Affordability (R)</h1>
     <div class="author">
     <div class="name">Christopher M. Overton</div>
-    <div class="role">Data Science & Applied Econometrics</div>
+    <div class="role">Data Science</div>
 
     <div class="contact">
-        <a href="https://www.linkedin.com/in/christopher-overton-485a4658" target="_blank">
+    <a href="https://www.linkedin.com/in/christopher-overton-485a4658" target="_blank" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+        <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 24V7h5v17H0zM8 7h4.8v2.3h.07c.67-1.27 2.3-2.6 4.73-2.6C22.4 6.7 24 9.6 24 14.1V24h-5v-8.5c0-2-.04-4.6-2.8-4.6-2.8 0-3.23 2.2-3.23 4.5V24H8z"/>
+        </svg>
         linkedin.com/in/christopher-overton-485a4658
-        </a>
-        <span class="sep">•</span>
-        <a href="mailto:christophermoverton@gmail.com">
+    </a>
+
+    <span class="sep">•</span>
+
+    <a href="mailto:christophermoverton@gmail.com" aria-label="Email">
+        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
         christophermoverton@gmail.com
-        </a>
+    </a>
     </div>
+
 
     <div class="date">Last updated: January 2026</div>
     </div>
