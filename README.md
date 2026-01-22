@@ -77,6 +77,19 @@ Raw data are ingested from public APIs and source files, then transformed into a
 
 ---
 
+## Analysis
+
+**View the full interactive analysis:**  
+https://christophermoverton.github.io/housing-affordability-R/02_analysis_eda_modeling.html
+
+**Data Transform and Harmonization:**
+https://christophermoverton.github.io/housing-affordability-R/01_transformed_raw_to_process.nb.html
+
+**Data Ingestion:**
+https://christophermoverton.github.io/housing-affordability-R/Ingestion.nb.html
+
+---
+
 ## Setup and Reproducibility
 
 This project is fully reproducible using **`renv`** for package management and **`.Renviron`** for secure handling of API keys.
