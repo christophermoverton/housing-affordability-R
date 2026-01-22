@@ -1,0 +1,23 @@
+# RStudio / R session
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.R
+# Rendered outputs
+#*.html
+
+# renv (keep renv.lock)
+renv/library/
+renv/python/
+renv/staging/
+
+# Raw data
+data/raw/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+*.Renviron
+

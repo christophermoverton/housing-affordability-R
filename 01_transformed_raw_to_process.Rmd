@@ -1,0 +1,328 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Introduction
+
+This notebook documents the **data transformation and processing stage** of the housing affordability analysis pipeline. Its purpose is to convert raw, heterogeneous source data into a clean, consistent, and analysis-ready format suitable for exploratory analysis and modeling.
+
+The transformation process begins with the raw datasets generated during the ingestion stage, including Zillow Home Value Index (ZHVI) time series, macroeconomic indicators from the Federal Reserve Economic Data (FRED), and median household income estimates from the American Community Survey (ACS). These sources differ in temporal resolution, geographic definitions, and data structure, requiring systematic alignment and standardization before analysis.
+
+Key transformation steps performed in this notebook include reshaping wide time-series data into tidy long formats, harmonizing date conventions across sources, standardizing metropolitan region identifiers, adjusting prices for inflation, and reconciling annual income data with monthly housing and financial indicators. Where necessary, transparent imputation rules are applied to ensure temporal continuity while preserving the underlying structure of the data.
+
+This notebook is deliberately **procedural rather than analytical**. No exploratory data analysis or modeling is conducted here. Instead, each step focuses on producing well-defined intermediate datasets and a final processed panel that serves as the sole input to downstream analysis. Validation checks are included to confirm expected coverage, missingness, and variable ranges prior to saving outputs.
+
+All processed datasets produced by this notebook are written to the `data/processed/` directory and are tracked in version control. By separating ingestion, transformation, and analysis into distinct stages, the pipeline improves reproducibility, clarity, and maintainability, allowing analytical results to be traced back to their original data sources with minimal ambiguity.
+
+## Load Datasets and Frequency Harmonization
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+dir.create("data/processed", recursive = TRUE, showWarnings = FALSE)
+
+#---Mortgage rate: Week -> monthly average ---
+
+mortgage_m <- read_csv("./data/raw/fred_MORTGAGE30US_20000101.csv") %>%
+  mutate(date = floor_date(date,"month")) %>%
+  group_by(date) %>%
+  summarise(mortgage_30y = mean(MORTGAGE30US, NA.RM = TRUE), .groups = "drop")
+
+# --- CPI already monthly ---
+
+cpi_m <- read_csv("./data/raw/fred_CPIAUCSL_20000101.csv") %>%
+  rename(cpi = CPIAUCSL)
+
+#---Save ---
+write_csv(mortgage_m, "./data/processed/mortgage_monthly.csv")
+write_csv(cpi_m, "./data/processed/cpi_monthly.csv")
+```
+
+## Income -\> Monthly Panel
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+# Load annual income (2010–2023)
+income_annual <- read_csv(
+  "./data/raw/acs5_median_hh_income_metro_2010_2023.csv",
+  show_col_types = FALSE
+)
+
+# Load zhvi to get the monthly date span
+zhvi <- read_csv(
+  "./data/processed/zhvvi_metro_monthly.csv",
+  show_col_types = FALSE
+)
+
+# Define the global monthly date sequence (month-start)
+date_seq <- seq.Date(
+  from = min(zhvi$date),
+  to   = max(zhvi$date),
+  by   = "month"
+)
+
+# Normalizer so Census & Zillow names can match later
+normalize_region <- function(x) {
+  x %>%
+    stringr::str_remove(" Metropolitan Statistical Area$") %>%
+    stringr::str_remove(" Metro Area$") %>%
+    stringr::str_remove(" Micro Area$") %>%
+    stringr::str_trim()
+}
+
+# Convert annual -> monthly grid, fill down
+income_monthly <- income_annual %>%
+  mutate(
+    region_norm = normalize_region(region),
+    date = ymd(paste0(year, "-01-01"))
+  ) %>%
+  select(region_norm, date, income_median_hh) %>%
+  group_by(region_norm) %>%
+  tidyr::complete(date = date_seq) %>%
+  tidyr::fill(income_median_hh, .direction = "down") %>%
+  ungroup() %>%
+  arrange(region_norm, date)
+
+# Verify
+income_monthly %>%
+  summarise(
+    n_regions = n_distinct(region_norm),
+    start_date = min(date),
+    end_date = max(date),
+    pct_missing = mean(is.na(income_median_hh))
+  ) %>%
+  print()
+
+# Save
+#dir.create("./data/processed", recursive = TRUE, showWarnings = FALSE)
+readr::write_csv(income_monthly, "./data/processed/income_metro_monthly.csv")
+
+
+```
+
+## Zillow Data processing
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+zhvi_raw <- read_csv("./data/raw/Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv")
+
+#Columns are RegionID, SizeRank, RegionName, RegionType, StateName
+date_cols <- names(zhvi_raw) %>%
+  str_subset("^\\d{4}-\\d{2}-\\d{2}$")
+#print(date_cols)
+stopifnot(length(date_cols) > 0)
+
+#---Wide -> Long ---
+
+zhvi_metro <- zhvi_raw %>%
+  pivot_longer(
+    cols      =  all_of(date_cols),
+    names_to  =  "date",
+    values_to =  "zhvi",
+    values_drop_na = TRUE
+  ) %>%
+  mutate(
+    date = ymd(date),
+    region = str_trim(RegionName)
+  ) %>%
+  select(
+    region,
+    date,
+    zhvi
+  ) %>%
+  arrange(region, date)
+#head(zhvi_metro,100)
+#---Sanity checks ---
+stopifnot(all(!is.na(zhvi_metro$region)))
+stopifnot(all(!is.na(zhvi_metro$date)))
+stopifnot(all(!is.na(zhvi_metro$zhvi)))
+
+zhvi_metro <- zhvi_metro %>%
+  mutate(date = floor_date(date, "month"))
+
+zhvi_metro %>%
+  summarise(
+    n_regions = n_distinct(region),
+    start_date = min(date),
+    end_date = max(date)
+  ) %>%
+  print()
+
+write_csv(
+  zhvi_metro, "./data/processed/zhvvi_metro_monthly.csv"
+)
+```
+
+### CSUSHPISA dataset
+
+```{r}
+cs_m <- readr::read_csv("./data/raw/fred_CSUSHPISA_20000101.csv") %>%
+  mutate(date = ymd(date)) %>%
+  rename(case_shiller_us = CSUSHPISA) %>%
+  arrange(date)
+
+readr::write_csv(cs_m, "./data/processed/case_shiller_us_monthly.csv")
+```
+
+## Panel Construction
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+# --- Load processed datasets ---
+
+zhvi <- read_csv("./data/processed/zhvvi_metro_monthly.csv", show_col_types = FALSE)
+mortgage <- read_csv("./data/processed/mortgage_monthly.csv", show_col_types = FALSE)
+cpi <- read_csv("./data/processed/cpi_monthly.csv", show_col_types = FALSE)
+income <- read_csv("./data/processed/income_metro_annual.csv", show_col_types = FALSE)
+
+#---Define global monthly date sequence --
+date_seq <- seq.Date(
+  from = min(zhvi$date),
+  to = max(zhvi$date),
+  by = "month"
+)
+
+#--- Expand annual income to monthly (forward-fill) ---
+
+income_m <- income %>%
+  mutate(date = floor_date(date, "year")) %>%
+  group_by(region) %>%
+  tidyr::complete(date = date_seq) %>%
+  fill(income_median_hh, .direction = "updown") %>%
+  ungroup()
+
+
+#---Build unified metro-month panel ---
+
+housing_panel <- zhvi %>%
+  left_join(mortgage, by = "date") %>%
+  left_join(cpi, by = "date") %>%
+  left_join(income_m, by = c("region", "date"))
+
+#---checks ---
+
+housing_panel %>%
+  summarise(
+    n_regions = n_distinct(region),
+    start_date = min(date),
+    end_date = max(date),
+    pct_missing_zhvi = mean(is.na(zhvi)),
+    pct_missing_income = mean(is.na(income_median_hh))
+  ) %>%
+  print()
+
+
+```
+
+## Panel Integrity Check
+
+```{r}
+housing_panel %>%
+  summarise(
+    n_regions = n_distinct(region),
+    n_rows = n(),
+    start_date = min(date),
+    end_date = max(date),
+    pct_missing_zhvi = mean(is.na(zhvi)),
+    pct_missing_income = mean(is.na(income_median_hh)),
+    pct_missing_mortgage = mean(is.na(mortgage_30y)),
+    pct_missing_cpi = mean(is.na(cpi))
+  ) %>%
+  print()
+
+```
+
+### Normalization function for region
+
+```{r}
+normalize_region <- function(x){
+  x %>%
+    stringr::str_remove(" Metropolitain Statistical Area$") %>%
+    stringr::str_remove(" Metro Area$") %>%
+    stringr::str_remove(" Micro Area$") %>%
+    stringr::str_trim()
+}
+```
+
+### Apply normalization
+
+```{r}
+zhvi <- zhvi %>%
+  mutate(region_norm = normalize_region(region))
+
+income_m <- income_m %>%
+  mutate(region_norm = normalize_region(region))
+
+
+```
+
+### Rebuild the panel
+
+```{r}
+housing_panel <- zhvi %>%
+  left_join(mortgage, by = "date") %>%
+  left_join(cpi, by = "date") %>%
+  left_join(
+    income_m,
+    by = c("region_norm" = "region_norm", "date"="date")
+  )
+```
+
+### Check
+
+```{r}
+housing_panel %>%
+  summarise(
+    pct_missing_income = mean(is.na(income_median_hh))
+  ) %>% print()
+```
+
+```{r}
+head(housing_panel, 200)
+```
+
+## Save the full panel
+
+```{r}
+write_csv(
+  housing_panel,
+  "./data/processed/housing_panel_metro_monthly.csv"
+)
+```
+
+## Filter to metros with income coverage
+
+```{r}
+housing_panel_model <- housing_panel %>%
+  group_by(region_norm) %>%
+  filter(any(!is.na(income_median_hh))) %>%
+  ungroup()
+```
+
+### Recheck
+
+```{r}
+housing_panel_model %>%
+  summarise(pct_missing_income = mean(is.na(income_median_hh)))
+```
+
+Approximately 20% of Zillow-defined metro areas do not have corresponding ACS income estimates due to geographic definition differences. I restrict income-based analyses to metros with observed ACS coverage.
+
+### Save model ready panel
+
+```{r}
+readr::write_csv(
+  housing_panel_model,
+  "./data/processed/housing_panel_model_metro_monthly.csv"
+)
+
+message("Saved: data/processed/housing_panel_model_metro_monthly.csv")
+```
