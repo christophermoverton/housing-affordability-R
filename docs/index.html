@@ -109,31 +109,55 @@
       color: var(--accent);
       font-weight: 600;
     }
+
     .author {
-      margin-top: 14px;
-      margin-bottom: 28px;
-      line-height: 1.5;
+      margin-top: 18px;
+      margin-bottom: 32px;
     }
 
-    .meta-line {
+    .author .name {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+
+    .author .role {
       font-size: 0.9rem;
       color: var(--muted);
+      margin-top: 2px;
     }
 
-    .meta-line a {
+    .author .contact {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .author .contact a {
       color: var(--accent);
       text-decoration: none;
       font-weight: 500;
     }
 
-    .meta-line a:hover {
+    .author .contact a:hover {
       text-decoration: underline;
     }
 
-    .date {
+    .author .sep {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .author .date {
+      margin-top: 8px;
       font-size: 0.8rem;
+      color: var(--muted);
       opacity: 0.9;
     }
+
 
   </style>
 </head>
@@ -142,24 +166,21 @@
   <main class="container">
     <h1>Housing Affordability (R)</h1>
     <div class="author">
-    <strong>Christopher M. Overton</strong><br />
-    <span class="meta-line">
-        Data Science & Applied Econometrics
-    </span><br />
-    <span class="meta-line">
+    <div class="name">Christopher M. Overton</div>
+    <div class="role">Data Science & Applied Econometrics</div>
+
+    <div class="contact">
         <a href="https://www.linkedin.com/in/christopher-overton-485a4658" target="_blank">
         linkedin.com/in/christopher-overton-485a4658
         </a>
-        ·
+        <span class="sep">•</span>
         <a href="mailto:christophermoverton@gmail.com">
         christophermoverton@gmail.com
         </a>
-    </span><br />
-    <span class="meta-line date">
-        Last updated: January 2026
-    </span>
     </div>
 
+    <div class="date">Last updated: January 2026</div>
+    </div>
     <p>
       Housing affordability has become a central economic and policy concern in the United States,
       particularly in the years following the COVID-19 pandemic. Rapid home price appreciation,
