@@ -168,7 +168,7 @@ In the code above, this index is constructed as:
 
 Higher values of the affordability index indicate greater housing affordability, as households have more income relative to required mortgage payments. Conversely, declines in the index reflect tighter affordability driven by rising home prices, higher interest rates, or slower income growth.
 
-*The affordability index follows standard housing economics practice by relating household income to the cost of financing housing, consistent with user-cost and affordability frameworks used in applied housing research* \[\@poterba_1984; \@glaeser_gyourko_2018\].
+*The affordability index follows standard housing economics practice by relating household income to the cost of financing housing, consistent with user-cost and affordability frameworks used in applied housing research* [@poterba_1984; @glaeser_gyourko_2018].
 
 ------------------------------------------------------------------------
 
