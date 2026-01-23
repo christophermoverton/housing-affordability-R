@@ -40,8 +40,8 @@ Zillow Home Value Index (ZHVI) values are reported in **nominal dollars**, meani
 To convert nominal home prices into real terms, ZHVI values are deflated using the Consumer Price Index (CPI):
 
 $$
-\text{Real Home Price}*{r,t}
-= \frac{\text{ZHVI}*{r,t}}{\text{CPI}_t} \times 100
+\text{Real Home Price}_{r,t}
+= \frac{\text{ZHVI}_{r,t}}{\text{CPI}_t} \times 100
 $$
 
 In the code above:
