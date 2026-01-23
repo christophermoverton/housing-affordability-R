@@ -566,7 +566,7 @@ cf_national %>%
   theme_minimal()
 ```
 
-We see that observed affordability collapses after 2021 while the counterfactual line is much higher. The vertical gap iss the rate-driven affordability loss.
+We see that observed affordability collapses after 2021 while the counterfactual line is much higher. The vertical gap is the rate-driven affordability loss.
 
 ### Quantifying the effect
 
