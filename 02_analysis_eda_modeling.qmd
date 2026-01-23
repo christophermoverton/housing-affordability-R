@@ -343,6 +343,8 @@ housing_panel %>%
   round(2)
 ```
 
+Correlation analysis indicates that housing affordability is most strongly associated with mortgage interest rates (r = −0.66), followed by real home prices (r = −0.52). Median household income exhibits almost no direct correlation with affordability (r = −0.05), suggesting that income growth has not kept pace with price and financing pressures. These results highlight the dominant role of monetary conditions in shaping affordability outcomes across U.S. metropolitan areas.
+
 ### Growth Mismatch: Prices vs Income
 
 ```{r}
@@ -412,21 +414,76 @@ model_base <- lm(
 summary(model_base)
 ```
 
-Mortgage_rate_monthly interpretation
+### Baseline Log-Linear Affordability Model
 
-One percentage point annual increase
+We estimate the following log-linear specification:
 
-A 1 pp annual rate increase = 0.01 / 12 ≈ 0.00083 monthly
+$$
+\log(\text{Affordability}_{r,t}) = \beta_0 + \beta_1 ,\text{MortgageRate}_{r,t} + \beta_2 \log(\text{ZHVI}_{r,t}) + \beta_3 \log(\text{Income}_{r,t}) + \varepsilon_{r,t}
+$$
 
-Δlog(Affordability)≈−242×0.00083≈−0.20
+using a pooled metro–month panel.
 
-Δlog(Y)≈%ΔY
+------------------------------------------------------------------------
 
-A 1 percentage point increase in the annual mortgage rate is associated with approximately a 20% decline in housing affordability.
+### Coefficient Interpretation
 
-Affordability exhibits approximately unit elasticity with respect to both real home prices and household income. A 1% increase in real prices reduces affordability by roughly 1%, while a 1% increase in income raises affordability by a similar magnitude. This confirms that long-run affordability dynamics are governed by the relative growth of prices and income.
+#### Mortgage Rate (Monthly)
 
-### Counterfactual analysis (highest ROI)
+**Estimate:** −242.0 **p-value:** \< 0.001
+
+Mortgage rates exert a **large and highly statistically significant** effect on housing affordability. Because the mortgage rate enters in levels while affordability is logged, the coefficient captures a semi-elasticity.
+
+A one percentage point increase in the **annual** mortgage rate corresponds to a monthly increase of approximately: $$
+0.01 / 12 \approx 0.00083
+$$
+
+The implied change in affordability is: $$
+\Delta \log(\text{Affordability}) \approx -242 \times 0.00083 \approx -0.20
+$$
+
+**Interpretation:** A **1 percentage point increase in the annual mortgage rate is associated with roughly a 20% decline in housing affordability**, holding prices and income constant.
+
+This result highlights the dominant role of financing conditions in driving short-run affordability dynamics.
+
+------------------------------------------------------------------------
+
+#### Real Home Prices (ZHVI)
+
+**Estimate:** −1.007 **p-value:** \< 0.001
+
+Affordability exhibits approximately **unit elasticity** with respect to real home prices. A 1% increase in inflation-adjusted home values reduces affordability by roughly **1%**.
+
+------------------------------------------------------------------------
+
+#### Median Household Income
+
+**Estimate:** +1.036 **p-value:** \< 0.001
+
+Affordability also exhibits near-unit elasticity with respect to income. A 1% increase in median household income raises affordability by approximately **1%**.
+
+------------------------------------------------------------------------
+
+### Model Fit
+
+-   **R²:** 0.994
+-   **Adjusted R²:** 0.994
+-   **Residual standard error:** 0.034
+
+The model explains nearly all variation in log affordability across metro–month observations, reflecting the mechanical and accounting-driven relationship between prices, income, interest rates, and payment-based affordability measures.
+
+------------------------------------------------------------------------
+
+### Economic Interpretation
+
+Taken together, these results imply:
+
+-   **Long-run affordability** is governed by the **relative growth of home prices and household income**, consistent with standard housing economics.
+-   **Short-run affordability fluctuations**, however, are overwhelmingly driven by **mortgage interest rates**, with even modest rate increases producing large declines in purchasing power.
+
+This helps explain why affordability deteriorated so rapidly during post-2021 monetary tightening, even in markets where income growth remained strong.
+
+## Counterfactual analysis (highest ROI)
 
 *What if mortgage rates had not spiked?*
 
