@@ -106,8 +106,8 @@ housing_panel <- housing_panel %>%
 To approximate the cost of servicing a mortgage on a median-priced home, this analysis constructs a **simple mortgage payment proxy** based on an interest-only formulation. The proxy is defined as the product of the real home price and the monthly mortgage interest rate:
 
 $$
-\text{Mortgage Payment Proxy}*{r,t}
-= \text{Real Home Price}*{r,t} \times r_t^{\text{monthly}}
+\text{Mortgage Payment Proxy}_{r,t}
+= \text{Real Home Price}_{r,t} \times r_t^{\text{monthly}}
 $$
 
 In the code above:
